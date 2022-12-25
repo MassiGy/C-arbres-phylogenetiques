@@ -62,5 +62,6 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
+	
 	return test_nb_esp_caracs(a, filename, expected_nb_esp, expected_nb_carac);
 }

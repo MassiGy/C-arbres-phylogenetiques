@@ -1,0 +1,17 @@
+digraph arbre {
+	vertebres -> machoires [label = "oui"]
+	machoires -> lamproie [label = "non"]
+	machoires -> doigts [label = "oui"]
+	doigts -> carpe [label = "non"]
+	doigts -> amnios [label = "oui"]
+	amnios -> grenouille [label = "non"]
+	amnios -> placenta [label = "oui"]
+	placenta -> plumes [label = "non"]
+	placenta -> cornes [label = "oui"]
+	plumes -> crocodile [label = "non"]
+	plumes -> autruche [label = "oui"]
+	cornes -> canines [label = "non"]
+	cornes -> vache [label = "oui"]
+	canines -> lapin [label = "non"]
+	canines -> chat [label = "oui"]
+}

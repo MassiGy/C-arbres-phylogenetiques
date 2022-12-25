@@ -1,10 +1,10 @@
 all: main acte1 acte2 acte3 acte3b acte4
 
 
-CC=clang
-CFLAGS=-g -Wall -Wextra -Werror -Wno-unused-parameter
+CC=gcc
+CFLAGS=-g -Wall -Wextra 
 
-
+# -Werror -Wno-unused-parameter
 
 tests_acte1: acte1
 	@set -e; for f in `ls tests_acte1`; do ./acte1 tests_acte1/$$f; done; printf "\033[0;32mSuccès\033[0m sur l'acte I !\n"

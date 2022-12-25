@@ -4,23 +4,25 @@
 typedef struct liste liste_t;
 /* Type de liste à compléter selon votre besoin. */
 
-typedef char* string;
+typedef char *string;
 
-struct cellule {
+struct cellule
+{
 	string val;
-	struct cellule* suivant;
+	struct cellule *suivant;
 };
 
 typedef struct cellule cellule_t;
 
-struct liste {
+struct liste
+{
 	cellule_t *tete;
 };
 
 typedef struct liste liste_t;
 
 /* cree une nouvelle liste, initialement vide */
-void init_liste_vide(liste_t* L);
+void init_liste_vide(liste_t *L);
 
 /* libère toutes les cellules de la liste */
 void liberer_liste(liste_t *L);
@@ -32,7 +34,13 @@ void liberer_liste(liste_t *L);
  */
 int ajouter_tete(liste_t *L, string c);
 
+/* supprimer une cellule
+ * en tête de la liste L.
+ * Si la suppression est réussite, le résultat est 0,
+ * et 1 sinon (échec de la suppression)
+ */
+int supprimer_tete(liste_t *L);
+
+void afficher_list(liste_t *L);
 
 #endif /* _LISTES_H */
-
-
