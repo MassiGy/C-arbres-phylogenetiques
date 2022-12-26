@@ -98,8 +98,112 @@ int rechercher_espece(arbre racine, char *espece, liste_t *seq)
 /* Doit renvoyer 0 si l'espece a bien ete ajoutee, 1 sinon, et ecrire un
  * message d'erreur.
  */
-int ajouter_espece(arbre *a, char *espece, cellule_t *seq)
+int ajouter_espece(arbre *p_arbre, char *espece, cellule_t *seq)
 {
+   /**
+    * Notre algorithm va consister à parcourir l'arbre à partir de la racine vers le bas,
+    * En faisant cela, nous allons à chaque étape voir si l'espece à insérer a la caracs
+    * du noeud actuel de l'arbre.
+    *
+    * Si oui, nous allons continuer vers la droite, et nous allons en même temp supprimer un element de la tête de la list.
+    * Si non, nous allons continuer vers la gauche, et nous allons en même temp supprimer un element de la tête de la list.
+    *
+    * Si au bout d'une certaine progression dans le parcours de l'arbre, on découvre que l'espece à une carac qui n'est pas dans l'arbre
+    * Nous allons la créer dans le fils droit du noued actuel, car elle a la carac du noeud actuel, et nous allons après insérer l'espece
+    * dans le fils droit du noeud créer.
+    *
+    */
+
+   if (p_arbre == NULL)
+   {
+      printf("\033[0;31mERREUR\033[0m : l'adresse de l'arbre passée n'est pas valide\n");
+      return 1;
+   }
+
+   if ((*p_arbre) == NULL)
+   {
+      // ça veux dire qu'il faut construire le sous-arbre
+
+      if (seq == NULL)
+      {
+         // ça veux dire que c'est le dernier appel récursif.
+
+         // ajouter l'espece
+         *p_arbre = malloc(sizeof(arbre));
+         (*p_arbre)->valeur = malloc(sizeof(char) * (strlen(espece) + 1));
+         strcpy((*p_arbre)->valeur, espece);
+         (*p_arbre)->droit = NULL;
+         (*p_arbre)->gauche = NULL;
+
+         return 0;
+      }
+      else
+      {
+         // ça veux dire que ce n'est pas le dernier appel récursif.
+
+         // ajouter dans la racine actuel la carac en tête de la seq
+         *p_arbre = malloc(sizeof(arbre));
+         (*p_arbre)->valeur = malloc(sizeof(char) * (strlen(seq->val) + 1));
+         strcpy((*p_arbre)->valeur, seq->val);
+         (*p_arbre)->gauche = NULL;
+         (*p_arbre)->droit = NULL;
+
+         // faire un appel recursif sur le fils droit pour insérer l'espece
+         return ajouter_espece(&((*p_arbre)->droit), espece, seq->suivant);
+      }
+   }
+
+   if ((*p_arbre)->droit == NULL && (*p_arbre)->gauche == NULL)
+   {
+      // ça veux dire qu'on est arrivé à une espèce.
+      if (seq == NULL)
+      {
+         // si l'espece dans l'arbre et celle à insérer ont exactement les mêmes caracs,
+         // on revois un message d'erreurs, car on ne peut les insérer.
+         printf("\033[0;31mERREUR\033[0m : l'espèce %s a les mêmes caracs que l'espèce %s.\n", espece, (*p_arbre)->valeur);
+         return 1;
+      }
+      else
+      {
+         // si non, on insere les carac de l'espece en paramètres,
+         // puis reinsérer l'espece présente dans l'arbre dans le fils gauche,
+         // car forcement elle a pas les carac en plus, que l'espece en param a.
+         // puis enfin, insérer l'espece en paramètres, dans sous fils droit,
+         // car l'espece en param a toutes les carac de la seq en param.
+
+         // sauvegarder la valeur de l'espece actuellement dans l'arbre. ( de la racine actuelle )
+         char *temp = malloc(sizeof(char) * (strlen((*p_arbre)->valeur) + 1));
+         strcpy(temp, (*p_arbre)->valeur);
+
+         // copier la carac en tête de seq vers la racince actuel
+         strcpy((*p_arbre)->valeur, seq->val);
+
+         // copier l'espece stocker dans temp vers le fils gauche de la racine actuel
+         // note: ce fils gauche n'existe pas encore.
+         (*p_arbre)->gauche = malloc(sizeof(arbre));
+         (*p_arbre)->gauche->valeur = malloc(sizeof(char) * (strlen(temp) + 1));
+         strcpy((*p_arbre)->gauche->valeur, temp);
+         (*p_arbre)->gauche->droit = NULL;
+         (*p_arbre)->gauche->gauche = NULL;
+
+         // insérer l'espece en paramètre dans le fils droit.
+         // note: ce fils droit n'existe pas encore.
+         return ajouter_espece(&((*p_arbre)->droit), espece, seq->suivant);
+      }
+   }
+
+   if (strcmp((*p_arbre)->valeur, seq->val) == 0)
+   {
+      // ça veut dire que l'espèce a la carac et qu'on doit l'insérer à la droite
+      // si j'ai la carac dans l'arbre, passer à la suivante dans la liste
+      return ajouter_espece(&((*p_arbre)->droit), espece, seq->suivant);
+   }
+   else
+   {
+      // ça veut dire que l'espèce n'a pas la carac et qu'on doit l'insérer à la gauche
+      // si je n'ai pas la carac dans l'arbre, passer la liste entière pour l'insérer
+      return ajouter_espece(&((*p_arbre)->gauche), espece, seq);
+   }
 
    return 1;
 }
@@ -110,7 +214,105 @@ int ajouter_espece(arbre *a, char *espece, cellule_t *seq)
  */
 void afficher_par_niveau(arbre racine, FILE *fout)
 {
-   printf("<<<<< À faire: fonction afficher_par_niveau fichier " __FILE__ "\n >>>>>");
+   /**
+    * L'algorithm va être un parcour en largeur, breadth first search
+    *
+    * Pour cela, on va utiliser un algorithm itératif. On utilisera aussi
+    * deux listes comme des files
+    *
+    * une file result, elle stockera les valeurs des carac et un "\n" après
+    * chaque niveau parcouru, pour un correct affichage.
+    *
+    * une file visited, elle stockera les références des noeud contenant une carac visités.
+    *
+    * On va appeler la fonction à partir de la racine, et on va mettre la valeur de la racine
+    * dans la file result, suivi du "\n", et on mettera la référence de la racine dans la file
+    * visited.
+    *
+    * Puis à l'aide d'une boucle tant que, muni d'une condition d'arrêt qui teste le fait que
+    * la longueure de la file visited > 0
+    *
+    * Nous allons, retirer le premier elements de la file visited
+    * puis le déréférencé et ajouter les références de son fils gauche d'abord dans la file
+    * visited, et aussi sa valeur suivi d'un "\n" dans la file result,
+    * puis faire la même chose pour le fils droit.
+    *
+    * Passer à l'itération suivante de la boucle tant que.
+    *
+    * à la fin on aurra notre affichage dans la liste result,
+    * chaque deux étage sont sparré par un "\n"
+    *
+    *
+    * Or, même si cela est la plus facile, optimisé et intuitive approche, cela ne marchera pas dans notre
+    * contexte, car notre liste n'a pas de champ pour stocker une référence. À moins de l'ajouter.
+    *
+    *
+    *
+    * Du coup, nous allons utiliser la version récursive, qui est un peu plus compliqué à assimiler.
+    *
+    * l'idée est simple: nous allons utiliser un depth first search pour afficher, mais nous allons indiquer
+    * la profondeur à laquelle l'affichage doit être éffectuer.
+    *
+    * Nous allons aussi, déclarer une fonction utilitaire (helper) pour arriver à ce but.
+    * cette fonction nous permettera d'afficher un étage de l'arbre à une certaine profondeur passée en paramètres
+    *
+    * Premièrement, dans la fonction principale, nous allons itérer sur tous les étage de l'arbre et appeler
+    * la fonction utilitaire.
+    *
+    * Dans la fonction utilitaire, qui va recevoir la racine de l'arbre et un étage L, nous allons faire deux appels
+    * recursif sur le fils gauche puis sur le fils droit, en décrimentant l'etage de 1 à chaque fois.
+    *
+    * notre condition d'arret est quand L == 0, dans ce cas on va afficher la valeur.
+    *
+    *
+    * Une autre façon de voir cette idée, c'est de faire un depth first search, avec un compteur, et tant que
+    * ce compteur n'a pas attient une valeur, aucune valeur ne doit être affichée.
+    *
+    * Nous aurions aussi pu, faire le contraire, ou on passe un compteur qui commence à 1, et qu'on va incrémenter
+    * jusqu'a la valeur L. mais la valeur de L, aurrai du être ajouter à l'aide d'un troisième paramètre.
+    */
+   int height = hauteur_arbre(racine);
+   for (int level = 0; level < height; ++level)
+   {
+      // afficher l'étage à la profondeur i
+      printCurrentLevel(racine,fout, 0, level);
+      fprintf(fout,"%s","\n");
+   }
+   return;
+}
+
+void printCurrentLevel(arbre racine, FILE *fout, int accumulator, int level)
+{
+
+   if (racine == NULL)
+      return;
+
+   if (accumulator == level && !(racine->droit == NULL && racine->gauche == NULL))
+   {
+      fprintf(fout,"%s ", racine->valeur);
+   }
+   else
+   {
+      printCurrentLevel(racine->gauche,fout, accumulator +1, level);
+      printCurrentLevel(racine->droit, fout,accumulator +1, level);
+   }
+}
+
+int max(int a, int b)
+{
+   if (a >= b)
+      return a;
+   return b;
+}
+
+int hauteur_arbre(arbre racine)
+{
+   if (racine == NULL)
+      return 0;
+   if (racine->droit == NULL && racine->gauche == NULL)
+      return 1;
+
+   return (1 + max(hauteur_arbre(racine->gauche), hauteur_arbre(racine->droit)));
 }
 
 // Acte 4

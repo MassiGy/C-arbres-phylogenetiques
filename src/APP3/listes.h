@@ -34,6 +34,10 @@ void liberer_liste(liste_t *L);
  */
 int ajouter_tete(liste_t *L, string c);
 
+
+int ajouter_queue(liste_t *L, string c);
+
+
 /* supprimer une cellule
  * en tête de la liste L.
  * Si la suppression est réussite, le résultat est 0,
@@ -42,5 +46,8 @@ int ajouter_tete(liste_t *L, string c);
 int supprimer_tete(liste_t *L);
 
 void afficher_list(liste_t *L);
+
+int linearSearch(liste_t* L, string c);
+
 
 #endif /* _LISTES_H */

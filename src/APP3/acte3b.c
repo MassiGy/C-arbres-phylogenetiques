@@ -47,6 +47,7 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
+
 	FILE* ftest = fopen("_tmp", "w");
 	afficher_par_niveau(a, ftest);
 	fclose(ftest);

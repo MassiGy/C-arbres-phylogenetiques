@@ -20,6 +20,7 @@ int rechercher_espece (arbre racine, char *espece, liste_t* seq);
 int ajouter_espece (arbre* racine, char *espece, cellule_t* seq);
 
 void afficher_par_niveau(arbre racine, FILE* fout);
+void printCurrentLevel(arbre racine, FILE *fout, int accumulator, int level);
 
 // on considère qu'il n'est pas possible
 // d'insérer une caractéristique à un arbre vide, ni d'insérer une caractéristique
@@ -28,6 +29,12 @@ void afficher_par_niveau(arbre racine, FILE* fout);
 // des noeuds caractéristique sans enfant qui seraient confondues avec des
 // espèces/feuilles.
 int ajouter_carac(arbre* a, char* carac, cellule_t* seq);
+
+
+
+
+int hauteur_arbre(arbre racine);
+int max(int a, int b); // pour le calcule de la hauteur.
 
 
 #endif

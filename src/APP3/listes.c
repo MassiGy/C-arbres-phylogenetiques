@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <assert.h>
 #include <string.h>
 #include "listes.h"
@@ -96,6 +97,38 @@ int ajouter_tete(liste_t *L, string c)
     return 0;
 }
 
+int ajouter_queue(liste_t *L, string c)
+{
+    if (strcmp(c, "") == 0 || c == NULL || strcmp(c, "\0") == 0)
+        return 1;
+
+    if (L == NULL)
+        return 1; // on ne peut pas ajouté vers une list non crée !, car l'adresse de L est passé par copie!
+
+    if (L->tete == NULL)
+    { // par contre on peu ajouter vers une list vide
+
+        L->tete = malloc(sizeof(cellule_t));
+        L->tete->val = malloc((strlen(c) + 1) * sizeof(char));
+        strcpy(L->tete->val, c);
+        L->tete->suivant = NULL;
+        return 0;
+    }
+
+    cellule_t *temp = L->tete;
+    while (temp->suivant != NULL)
+    {
+        temp = temp->suivant;
+    }
+
+    temp->suivant = malloc(sizeof(cellule_t));
+    temp->suivant->suivant = NULL;
+    temp->suivant->val = malloc(sizeof(char) * (strlen(c) + 1));
+    strcpy(temp->suivant->val, c);
+
+    return 0;
+}
+
 int supprimer_tete(liste_t *L)
 { /* retourne 0 si OK, 1 sinon  */
     if (L == NULL || L->tete == NULL)
@@ -108,4 +141,22 @@ int supprimer_tete(liste_t *L)
     free(L->tete);
     L->tete = temp;
     return 0;
+}
+
+int linearSearch(liste_t *L, string c)
+{
+    if (L == NULL || L->tete == NULL)
+    {
+        return 1;
+    }
+
+    cellule_t *temp = L->tete;
+
+    while (temp != NULL)
+    {
+        if(strcmp(temp->val, c) == 0) return 0;;
+        temp = temp->suivant;
+    }
+
+    return 1;
 }
