@@ -109,8 +109,8 @@ void affiche_arbre(noeud *racine)
      *
      *   pour faire cela, nous allons utiliser un parcour en profondeur dans  l'ordre (gauche puis racine puis droite)
      *
-     *   complexity en temps ~ O(N)
-     *   complexity en espace ~ O(1)
+     *   time complexity     ~ O(N)
+     *   space complexity    ~ O(1)
      *
      */
 
@@ -145,6 +145,5 @@ void affiche_arbre(noeud *racine)
     affiche_arbre(racine->gauche);
     affiche_arbre(racine->droit);
 
-    // pour sortir de puis le premier appel de la fonction
     return;
 }
